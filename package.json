@@ -1,0 +1,21 @@
+{
+  "name": "WorldGen",
+  "version": "1.0.0",
+  "description": "Tectonics based procedural generation of world maps.",
+  "main": "index.js",
+  "repository": "https://github.com/wpower12/WorldGen.git",
+  "author": "wpower12",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "local-web-server": "^2.5.1",
+    "simplex-noise": "^2.4.0",
+    "three": "^0.90.0",
+    "webpack": "^4.1.1",
+    "webpack-cli": "^2.0.10"
+  },
+  "scripts": {
+    "build": "webpack --watch",
+    "serve": "cd dist && ../node_modules/.bin/ws"
+  }
+}
