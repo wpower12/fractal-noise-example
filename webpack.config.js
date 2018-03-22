@@ -1,8 +1,11 @@
 const path = require('path');
 
 module.exports = {
+  mode: 'development',
   entry: {
-    index:    './src/gen.js'
+  	template:   './src/template.js',
+    fractal:    './src/fractal.js',
+    tectonics:  './src/tectonics.js'
   },
   output: {
     filename: '[name]_bundle.js',

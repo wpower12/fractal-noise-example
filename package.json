@@ -15,7 +15,7 @@
     "webpack-cli": "^2.0.10"
   },
   "scripts": {
-    "build": "webpack --watch",
+    "build": "webpack --debug --watch",
     "serve": "cd dist && ../node_modules/.bin/ws"
   }
 }
