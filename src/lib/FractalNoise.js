@@ -27,7 +27,6 @@ class FractalNoise {
 	    		}
 	    	}
 	    }
-	    console.log(map);
 	    return map;
 	};
 

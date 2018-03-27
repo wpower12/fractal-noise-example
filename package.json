@@ -16,6 +16,7 @@
   },
   "scripts": {
     "build": "webpack --debug --watch",
-    "serve": "cd dist && ../node_modules/.bin/ws"
+    "serve": "cd dist && ../node_modules/.bin/ws",
+    "prod": "webpack"
   }
 }

@@ -1,7 +1,14 @@
 class Helper {
+    constructor(){
+        this.int_id = -1;        
+    }
 
     draw_hmap_to_canvas(cvs, map, size, hue, thresh){
         var ctx = cvs.getContext("2d");
+        var w_px = cvs.width;
+        var h_px = cvs.height;
+        var o_x  = Math.floor((w_px - size*map.length)/2);
+        var o_y  = Math.floor((h_px - size*map[0].length)/2);
         for (var i = 0; i < map.length; i++) {
             for (var j = 0; j < map[0].length; j++) {
                 var val = map[i][j];
@@ -9,12 +16,16 @@ class Helper {
                 var x1 = i*size, x2 = x1+size;
                 var y1 = j*size, y2 = y1+size;
                 ctx.fillStyle = c;
-                ctx.fillRect(x1,y1,x2,y2);
+                ctx.fillRect(x1+o_x,y1+o_y,x2+o_x,y2+o_y);
             }
         }
     }
 
     attach_map_animation(cvs, map_list, size, hue, thresh){
+        if(this.int_id != -1){
+            console.log("clearning setInterval");
+            clearInterval(this.int_id);
+        }
         var m = 0;
         function draw(){
             var map = map_list[m];
@@ -22,8 +33,7 @@ class Helper {
             m += 1;
             if(m >= map_list.length){m = 0;}
         };
-
-        setInterval(draw.bind(this), 600);
+        this.int_id = setInterval(draw.bind(this), 600);
     }
 
 	get_color(hue, thresh, percent){
@@ -31,7 +41,7 @@ class Helper {
         if(percent > thresh){
             var n = Math.floor(100*percent)-1;
             ret = "hsl("+hue+", 55%, "+n+"%)";
-        } else {
+        } else {  
             ret = "hsl("+hue+", 55%, 0%)";
         }
         return ret;
