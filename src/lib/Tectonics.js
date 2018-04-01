@@ -143,6 +143,7 @@ function getPlates(map){
 		}
 		return plate_list;
 	}
+
 	return plates;
 }
 
@@ -169,17 +170,15 @@ function clearSmallPlates(map, plates, min_size){
 function simulate_movement(map, plates, plate_dirs, time_steps){
 	var world_list = [];
 	var world  = copy2d(map);
-	var groups = []   // collection of collided groups of plates
-	var free_plates = [...Array(plates.length).keys()];
-	var stale_list  = Array(plates.length).fill(false);
+	var groups = [];   // collection of collided groups of plates
+	var free_plates  = Array(plates.length).fill(false);
 	for (var t = 0; t < time_steps; t++){		
 		// update free plates
 		for (var f = 0; f < free_plates.length; f++) {
-			if(!stale_list[f]){
+			if(free_plates[f]){
 				var collided = false;
-				var p_idx = free_plates[f];
-				var plate = plates[p_idx];
-				var dir   = plate_dirs[p_idx];
+				var plate = plates[f];
+				var dir   = plate_dirs[f];
 				for (var c = 0; c < plate.length; c++) {
 					var cell = plate[c];
 					var nx   = modadd(cell[0], dir[0], map.length);
@@ -188,15 +187,14 @@ function simulate_movement(map, plates, plate_dirs, time_steps){
 					// check all other free plates
 					var colliding_plate = check_free_plates(plates, 
 															free_plates,
-															stale_list, 
-															p_idx, 
+															f, 
 															nx, ny);
 					if(colliding_plate > -1){
 						// combine and create new group, remove them from list
 						// then break the for loop.
 						var n_group = combine_plates(plates, 
 													plate_dirs, 
-													p_idx, 
+													f, 
 													colliding_plate);
 						groups.push(n_group);
 
@@ -311,13 +309,14 @@ function check_groups(groups, g_idx, nx, ny){
 						return g;
 					}
 				}
-			}
-			
+			}	
 		}
 	}
 	return -1;
 }
 
+// I think this is eating the cells from atleast one of the
+// groups. also leads to some weird gaps. 
 function combine_plates(plates, plate_dirs, p_idx, c_idx){
 	console.log("combining plates");
 	var ps = [plates[p_idx], plates[c_idx]];
@@ -374,7 +373,6 @@ function resolve_tectonics(map, group){
 	// have a value where it needs to be.
 }
 
-
 // ** Helper methods *****
 function copy2d(arr){
 	var ret = new Array();
@@ -398,5 +396,5 @@ function modadd(a, b, m){
 	}
 	return a+b;
 }
-
+ 
 export default Tectonics;
