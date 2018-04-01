@@ -171,7 +171,7 @@ function simulate_movement(map, plates, plate_dirs, time_steps){
 	var world_list = [];
 	var world  = copy2d(map);
 	var groups = [];   // collection of collided groups of plates
-	var free_plates  = Array(plates.length).fill(false);
+	var free_plates  = Array(plates.length).fill(true);
 	for (var t = 0; t < time_steps; t++){		
 		// update free plates
 		for (var f = 0; f < free_plates.length; f++) {
@@ -198,9 +198,9 @@ function simulate_movement(map, plates, plate_dirs, time_steps){
 													colliding_plate);
 						groups.push(n_group);
 
-						// make the current plate and coliding plate stale.
-						stale_list[f] = true;
-						stale_list[colliding_plate] = true;
+						// Both plates are no longer 'free'.
+						free_plates[f] = false;
+						free_plates[colliding_plate] = false;
 						collided = true;
 						break;	
 					}
@@ -208,8 +208,8 @@ function simulate_movement(map, plates, plate_dirs, time_steps){
  					var colliding_group = check_groups(groups, -1, nx, ny);	
  					if(colliding_group > -1){
  						// there's a collision, add plate to group, remove from list, break.
- 						add_plate_to_group(plates, p_idx, groups[colliding_group]);
- 						stale_list[f] = true;
+ 						add_plate_to_group(plates, f, groups[colliding_group]);
+ 						free_plates[f] = true;
 						collided = true; 
 						break;
  					}
@@ -233,32 +233,27 @@ function simulate_movement(map, plates, plate_dirs, time_steps){
 				var plate = g_plates[p];
 				for (var c = 0; c < plate.length; c++) {
 					var cell = plate[c];
-
 					var nx   = modadd(cell[0], dir[0], map.length);
 					var ny   = modadd(cell[1], dir[1], map[0].length);
 					
 					// check all other free plates
 					var colliding_plate = check_free_plates(plates, 
 															free_plates,
-															stale_list, 
 															-1, 
 															nx, ny);
 					if(colliding_plate > -1){
-						// combine and create new group, remove them from list, 
-						// then break the for loop.
+						// combine and create new group.
 						add_plate_to_group(plates, colliding_plate, group); 
-
-						// removing the index from the free list
-						stale_list[colliding_plate] = true;
+						free_plates[colliding_plate] = false;
 						collided = true;
 						break;	
 					}
 					// check the groups
  					var colliding_group = check_groups(groups, g, nx, ny);	
  					if(colliding_group > -1){
- 						// collision between two groups, combine them.
+ 						// TODO - i think theres atleast 2.5 bugs here.
  						combine_groups(groups, colliding_group, g);
- 						// TODO - track stale groups? blarg.
+ 						// TODO - track stale groups? blarg. I worry this is the source of non moving groups.
 						groups.splice(colliding_group, 1);
 						collided = true; 
 						break;
@@ -278,13 +273,12 @@ function simulate_movement(map, plates, plate_dirs, time_steps){
 }
 
 // ** MovementSimulation Helper Methods
-function check_free_plates(plates, free_plates, stale_list, i_idx, nx, ny){
+function check_free_plates(plates, free_plates, i_idx, nx, ny){
 	// check all of the plates for collisions with x/y
 	// ignore the plate at index i_idx. if i_idx is -1, look at all of them. ''ignore' index
-	for (var p = 0; p < free_plates.length; p++) {
-		var p_idx = free_plates[p];
-		if(p_idx != i_idx && !stale_list[p]){
-			var plate = plates[p_idx];
+	for (var p = 0; p < free_plates.length; p++) {;
+		if(p != i_idx && free_plates[p]){
+			var plate = plates[p];
 			for (var c = 0; c < plate.length; c++) {
 				var cell = plate[c];
 				if (cell[0] == nx && cell[1] == ny) {
